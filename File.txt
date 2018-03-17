@@ -1,0 +1,57 @@
+package bellmanForn;
+
+import java.util.ArrayList;
+
+public class BellmanForn {
+    static public void main(String[] args){
+        int max=Integer.MAX_VALUE/2;
+        int[][] a={
+                {0,6,max,7,max},
+                {max,0,5,-4,8},
+                {max,-2,0,max,max},
+                {2,max,7,0,max},
+                {max,max,-3,9,0}
+        };
+        ArrayList<Vertex> vertices=new ArrayList<>();
+        vertices.add(new Vertex("s",0));
+        vertices.add(new Vertex("t",1));
+        vertices.add(new Vertex("x",2));
+        vertices.add(new Vertex("z",3));
+        vertices.add(new Vertex("y",4));
+        alg(vertices,"s",a);
+    }
+    static private void alg(ArrayList<Vertex> vertexArrayList,String source,int[][] direxredGraph){
+        vertexArrayList.get(0).setDv(0);
+        for (int i=1;i<vertexArrayList.size()-1;i++){
+            for (int j=0;j<vertexArrayList.size();j++)
+                for (int k=0;k<vertexArrayList.size();k++){
+                    relax(vertexArrayList.get(j),vertexArrayList.get(k),direxredGraph[j][k]);
+                }
+        }
+        for (int j=0;j<vertexArrayList.size();j++)
+            for (int k=0;k<vertexArrayList.size();k++){
+                if (vertexArrayList.get(j).getDv()>vertexArrayList.get(k).getDv()+direxredGraph[j][k]){
+                    System.out.println("存在负权回路！");
+                    System.exit(0);
+                }
+            }
+        for (Vertex vertex:vertexArrayList){
+                System.out.println("从顶点t出发到"+vertex.getName()+"的最短路径为：");
+                StringBuilder stringBuilder=new StringBuilder();
+                do {
+                    stringBuilder.append(vertex.getName());
+                    try {
+                        vertex=vertexArrayList.get(vertex.getFatherflag());
+                    }catch (Exception e){
+                        vertex=null;
+                    }
+                }while (vertex!=null);
+        }
+    }
+    static private void relax(Vertex u,Vertex v,int w){
+        if (v.getDv()>u.getDv()+w){
+            v.setDv(u.getDv()+w);
+            v.setFatherflag(u.getFlag());
+        }
+    }
+}
