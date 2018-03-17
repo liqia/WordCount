@@ -1,10 +1,64 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class WordCount {
     public static void main(String[] args) {
-        String text = retext(WordCount.class.getResourceAsStream("File.txt"));
+
+        String text=null;
+        try {
+            text = retext(WordCount.class.getResourceAsStream("File.txt"));
+        } catch (NullPointerException e) {
+        }
+        if (text == null) {
+            System.out.println("没有找到文件，请重新输入文件路径");
+        }
+
+        int[] canshu=new int[5];//0-3分别表示字符、单词、行数、代码行数/空行数/注释行、递归处理 的参数存在不存在
+        String file = new String();
+        String outputFile = new String();
+        String stopListFile = new String();
+        int flag=0;
+        for(int i=0;i<args.length;i++) {
+            if (args[i].equals("-c")) canshu[0]=1;
+            else if (args[i].equals("-w")) canshu[1]=1;
+            else if (args[i].equals("-l")) canshu[2]=1;
+            else if (args[i].equals("-a")) canshu[3]=1;
+            else if (args[i].equals("-s")) canshu[4]=1;
+            else if (args[i].equals("-o"))
+            {
+                if (i==args.length-1) erro("参数不匹配");
+                if (Pattern.compile("([a-z]|[A-Z]|[0-9])+.txt").matcher(args[i+1]).find())
+                {
+                    outputFile=args[i+1];
+                    i++;
+                }
+                else {
+                    erro("输出文件名不正确");
+                }
+            }
+            else if (args[i].equals("-e"))
+            {
+                if (i==args.length-1) erro("参数不匹配");
+                if (Pattern.compile("([a-z]|[A-Z]|[0-9])+.txt").matcher(args[i+1]).find())
+                {
+                    stopListFile=args[i+1];
+                    i++;
+                }
+                else {
+                    erro("参数不匹配");
+                }
+            }
+            else if (Pattern.compile("([a-z]|[A-Z]|[0-9])+.txt").matcher(args[i]).find()) {
+                flag=1;
+                file=args[i];
+            }
+        }
+        if (flag == 0) erro("参数不匹配");
+
         System.out.println("world:" + reWorld(text) + "\ncount:" + reCount(text) + "\n" + reLine(text));
     }
 
@@ -52,5 +106,11 @@ public class WordCount {
     static int reLine(String text) {
         String[] strings = text.split("\n");
         return strings.length + 1;
+    }
+
+    //erro
+    static void erro(String e) {
+        System.out.println(e);
+        System.exit(0);
     }
 }
