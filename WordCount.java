@@ -21,7 +21,7 @@ public class WordCount {
             else if (args[i].equals("-o"))
             {
                 if (i==args.length-1) erro("参数不匹配");
-                if (Pattern.compile("([a-z]|[A-Z]|[0-9])+\\.txt").matcher(args[i+1]).find())
+                if (Pattern.compile("\\w+\\.txt").matcher(args[i+1]).find())
                 {
                     outputFile=args[i+1];
                     i++;
@@ -33,7 +33,7 @@ public class WordCount {
             else if (args[i].equals("-e"))
             {
                 if (i==args.length-1) erro("参数不匹配");
-                if (Pattern.compile("([a-z]|[A-Z]|[0-9])+\\.txt").matcher(args[i+1]).find())
+                if (Pattern.compile("\\w+\\.txt").matcher(args[i+1]).find())
                 {
                     stopListFile=args[i+1];
                     i++;
@@ -42,7 +42,7 @@ public class WordCount {
                     erro("参数不匹配");
                 }
             }
-            else if (Pattern.compile("([a-z]|[A-Z]|[0-9])+\\.txt").matcher(args[i]).find()) {
+            else if (Pattern.compile("(\\w+|\\*)\\.\\w+").matcher(args[i]).find()) {
                 if (i==0) erro("输入参数不正确");
                 flag=1;
                 file=args[i];
@@ -62,16 +62,41 @@ public class WordCount {
 
         if (file.matches("\\*\\..+")){
             String houzui = file.substring(file.lastIndexOf(".")+1, file.length());
-            String houzuiR="\\."+houzui;
-            String[] files=new File(".").list();
-            for (String i : files) {
-                if (i.matches(houzuiR)) {
-                    executOne(canshu,i,stopListFile,outputFile);
+            String houzuiR=".*\\."+houzui;
+            if (canshu[4] == 1) {
+                ArrayList<File> fileList = findALLFile(new File("."), new ArrayList<File>());
+                for (File i : fileList) {
+                    if (i.getAbsolutePath().matches(houzuiR)) {
+                        executOne(canshu,i.getAbsolutePath(),stopListFile,outputFile);
+                    }
+                }
+            } else {
+                String[] files=new File(".").list();
+                for (String i : files) {
+                    if (i.matches(houzuiR)) {
+                        executOne(canshu,i,stopListFile,outputFile);
+                    }
                 }
             }
         }else {
             executOne(canshu,file,stopListFile,outputFile);
         }
+    }
+
+    public static ArrayList<File> findALLFile(File file,ArrayList<File> fileArrayList) {
+        if(file.isDirectory())//判断file是否是目录
+        {
+            File [] lists = file.listFiles();
+            if(lists!=null)
+            {
+                for(int i=0;i<lists.length;i++)
+                {
+                    findALLFile(lists[i],fileArrayList);//是目录就递归进入目录内再进行判断
+                }
+            }
+        }
+        fileArrayList.add(file);
+        return fileArrayList;
     }
 
     //执行单个file
@@ -124,7 +149,7 @@ public class WordCount {
     //统计String单词数
     static int reWorld(String text,String stopListFile) {
         String[] stopList=retext(stopListFile).split(" ");
-        String[] strings = text.split(" |,|\n");
+        String[] strings = text.split(",|\\s");
         int stringNull = 0;
         String[] var3 = strings;
         int var4 = strings.length;
@@ -145,7 +170,7 @@ public class WordCount {
     //统计行数
     static int reLine(String text) {
         String[] strings = text.split("\n");
-        return strings.length + 1;
+        return strings.length;
     }
 
     //返回代码行/空行/注释行数
