@@ -1,10 +1,12 @@
+﻿
 package bellmanForn;
 
-import java.util.ArrayList;
 
-public class BellmanForn {
+import java.util.ArrayList;
+//
+/*public class BellmanForn {
     static public void main(String[] args){
-        int max=Integer.MAX_VALUE/2;
+        int max=Integer.MAX_VALUE/2;*/
         int[][] a={
                 {0,6,max,7,max},
                 {max,0,5,-4,8},

@@ -1,3 +1,5 @@
+package momo;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +83,7 @@ public class WordCount {
         }else {
             executOne(canshu,file,stopListFile,outputFile);
         }
+
     }
 
     public static ArrayList<File> findALLFile(File file,ArrayList<File> fileArrayList) {
@@ -100,7 +103,7 @@ public class WordCount {
     }
 
     //执行单个file
-    static void executOne(int[] canshu, String file, String stopListFIle, String outputFile) {
+    static public void executOne(int[] canshu, String file, String stopListFIle, String outputFile) {
         StringBuffer outputString=new StringBuffer();
         String text = retext(file);
         if (canshu[0] == 1) {
@@ -120,12 +123,16 @@ public class WordCount {
     }
 
     //将文件转化为String
-    static String retext(String fileName) {
-        InputStream is= null;
+    static public String retext(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+        InputStream is = null;
         try {
             is = new FileInputStream(fileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            erro("找不到指定文件");
         }
         String text = null;
         try {
@@ -142,20 +149,26 @@ public class WordCount {
     }
 
     //统计String字符数
-    static int reCount(String text) {
-        return text.length() - 1;
+    static public int reCount(String text) {
+        if (text == null) {
+            return 0;
+        }
+        return text.length();
     }
 
     //统计String单词数
-    static int reWorld(String text,String stopListFile) {
-        String[] stopList=retext(stopListFile).split(" ");
-        String[] strings = text.split(",|\\s");
+    static public int reWorld(String text,String stopListFile) {
+        if (text == null) {
+            return 0;
+        }
+        String[] stopList=null;
+        if (retext(stopListFile) != null) {
+            stopList=retext(stopListFile).split(" ");
+        }
+        String[] strings = text.split("\\.|,|\\s");
         int stringNull = 0;
-        String[] var3 = strings;
-        int var4 = strings.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            String i = var3[var5];
+        for(int var5 = 0; var5 < strings.length; ++var5) {
+            String i = strings[var5];
             if (i.length() == 0) {
                 ++stringNull;
             }
@@ -168,21 +181,25 @@ public class WordCount {
     }
 
     //统计行数
-    static int reLine(String text) {
+    static public int reLine(String text) {
+        if (text == null) {
+            return 0;
+        }
         String[] strings = text.split("\n");
         return strings.length;
     }
 
     //返回代码行/空行/注释行数
-    static int[] reA(String fileName) {
+    static public int[] reA(String fileName) {
         return new CountLine().reA(fileName);
     }
 
     //输出结果到指定文件
-    static void output(String text, String outputFile) {
+    static public void output(String text, String outputFile) {
         try {
-            FileOutputStream fos = new FileOutputStream(outputFile);
+            FileOutputStream fos = new FileOutputStream(outputFile,true);
             fos.write(text.getBytes());
+            fos.close();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -190,7 +207,7 @@ public class WordCount {
     }
 
     //检查单词是否在停用词表
-    static boolean checkIN(String world, String[] stopList) {
+    static public boolean checkIN(String world, String[] stopList) {
         for (String stopword : stopList) {
             if (stopword.equals(world)) return true;
         }
@@ -198,7 +215,7 @@ public class WordCount {
     }
 
     //erro
-    static void erro(String e) {
+    static public void erro(String e) {
         System.out.println(e);
         System.exit(0);
     }
